@@ -1,5 +1,7 @@
 package umerofirst.umero.backend.controllers;
 
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import umerofirst.umero.backend.models.Space;
 import umerofirst.umero.backend.repositories.SpaceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +21,7 @@ public class SpaceController {
 
     // GET all spaces — supports ?activity= and ?location=
     @GetMapping
+    @Cacheable(value ="spaces", key="(@activity !=null?#activity :'any')+'_'+(#location !=null? #location :'all')")
     public List<Space> getSpaces(
             @RequestParam(required = false) String activity,
             @RequestParam(required = false) String location
@@ -44,6 +47,7 @@ public class SpaceController {
 
     // GET single space by id
     @GetMapping("/{id}")
+    @Cacheable(value="space", key="#id")
     public ResponseEntity<Space> getSpace(@PathVariable String id) {
         return spaceRepository.findById(id)
                 .map(ResponseEntity::ok)
@@ -52,6 +56,7 @@ public class SpaceController {
 
     // POST create space — use via Postman
     @PostMapping
+    @CacheEvict(value={"spaces","space"}, allEntries = true)
     public Space createSpace(@RequestBody Space space) {
         return spaceRepository.save(space);
     }
