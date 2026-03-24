@@ -19,7 +19,7 @@ public class SpaceController {
     @Autowired
     private SpaceRepository spaceRepository;
 
-    // ✅ GET all spaces with filters + caching
+
     @GetMapping
     @Cacheable(value = "spaces",
             key = "(#activity != null ? #activity : 'any') + '_' + (#location != null ? #location : 'all')")
@@ -51,11 +51,11 @@ public class SpaceController {
 
         } catch (Exception e) {
             e.printStackTrace();
-            return List.of(); // ✅ NEVER break frontend
+            return List.of(); //
         }
     }
 
-    // ✅ GET single space by id
+
     @GetMapping("/{id}")
     @Cacheable(value = "space", key = "#id")
     public ResponseEntity<Space> getSpace(@PathVariable String id) {
@@ -64,7 +64,7 @@ public class SpaceController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // ✅ POST create space
+
     @PostMapping
     @CacheEvict(value = {"spaces", "space"}, allEntries = true)
     public Space createSpace(@RequestBody Space space) {
